@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת צפייה בתלוש שכר אישי</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+        h2 { color: #1a73e8; margin-bottom: 10px; }
+        p { color: #5f6368; margin-bottom: 25px; }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: #1a73e8; outline: none; }
+        button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #1557b0; }
+        #error { color: #d93025; margin-top: 15px; display: none; font-weight: 500; }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a73e8;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 15px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>שלום רב</h2>
+    <p>הזן מספר עובד לצפייה בתלוש</p>
+    
+    <input type="password" id="empNumber" placeholder="מספר עובד" autocomplete="off">
+    <button onclick="accessPayslip()">כניסה לתלוש שלי</button>
+    
+    <div id="loader" class="loader"></div>
+    <p id="error">מספר עובד לא נמצא במערכת</p>
+</div>
+
+<script>
+    function accessPayslip() {
+        const empId = document.getElementById('empNumber').value.trim();
+        const errorDiv = document.getElementById('error');
+        const loader = document.getElementById('loader');
+        
+        if (!empId) return;
+
+        errorDiv.style.display = 'none';
+        loader.style.display = 'block';
+
+        // הכתובת של הקובץ האישי בלבד
+        const filePath = `${empId}.pdf`;
+
+        // בדיקה אם הקובץ קיים בשרת לפני העברה
+        fetch(filePath, { method: 'HEAD' })
+            .then(response => {
+                loader.style.display = 'none';
+                if (response.ok) {
+                    // העברה ישירה לקובץ ה-PDF של העובד
+                    window.location.href = filePath;
+                } else {
+                    errorDiv.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                loader.style.display = 'none';
+                errorDiv.style.display = 'block';
+            });
+    }
+
+    // מאפשר לחיצה על Enter במקלדת
+    document.getElementById('empNumber').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') accessPayslip();
+    });
+</script>
+
+</body>
+</html>
